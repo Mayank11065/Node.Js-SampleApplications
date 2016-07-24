@@ -1,0 +1,142 @@
+<html>
+	<head>
+		<title>User Database</title>
+		<style>
+		div.container {
+		width: 100%;
+		border: 1px solid gray;
+		}
+		
+		header, footer {
+		padding: 2em;
+		color: white;
+		background-color: black;
+		clear: left;
+		text-align: center;
+		}
+		table {
+			font-family: arial, sans-serif;
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		td, th {
+			border: 1px solid #dddddd;
+			text-align: left;
+			padding: 8px;
+		}
+
+		tr:nth-child(even) {
+			background-color: #dddddd;
+		}
+		/* The side navigation menu */
+		.sidenav {
+			height: 100%; /* 100% Full-height */
+			width: 0; /* 0 width - change this with JavaScript */
+			position: fixed; /* Stay in place */
+			z-index: 1; /* Stay on top */
+			top: 0;
+			left: 0;
+			background-color: #111; /* Black*/
+			overflow-x: hidden; /* Disable horizontal scroll */
+			padding-top: 60px; /* Place content 60px from the top */
+			transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+		}
+
+		/* The navigation menu links */
+		.sidenav a {
+			padding: 8px 8px 8px 32px;
+			text-decoration: none;
+			font-size: 25px;
+			color: #818181;
+			display: block;
+			transition: 0.3s
+		}
+
+		/* When you mouse over the navigation links, change their color */
+		.sidenav a:hover, .offcanvas a:focus{
+			color: #f1f1f1;
+		}
+
+		/* Position and style the close button (top right corner) */
+		.closebtn {
+			position: absolute;
+			top: 0;
+			right: 25px;
+			font-size: 36px !important;
+			margin-left: 50px;
+		}
+
+		/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+		#main {
+			transition: margin-left .5s;
+			padding: 20px;
+		}
+
+		/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+		@media screen and (max-height: 450px) {
+			.sidenav {padding-top: 15px;}
+			.sidenav a {font-size: 18px;}
+		}
+		</style>
+	</head>
+	<body>
+		<div id="mySidenav" class="sidenav">
+		  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">x</a>
+		  <a href="#" id="getContacts">View all contacts</a>
+		  <a href="#" id="showContactFilter">View specific Contact</a>
+		  <a href="#" id="showAddContactfilter">Add Contact</a>
+		  <a href="#" id="showDeleteContactfilter">Delete Contact</a>
+		</div>
+		<div id="main">
+			<div class="container">
+				<header>
+				   <h1 class="header">User Database Management</h1>
+				</header>
+			</div>
+			<br>
+			<div id="panel">
+				<div id ="ContactLists" style="display: none;">
+					<table>
+						<thead>
+							<tr>
+								<th>Id</th>
+								<th>Name</th>
+								<th>Profession</th>
+							<tr>
+						<thead>
+						<tbody id="contacts">
+						</tbody>
+					</table>
+				</div>
+				<br>
+				<div id="filterContactForm" style="display: none;">
+					<form>
+						Filter based on Id: <input type="text" id="user_id" />
+						<input type="button" value="Get Contact Details" id="getSpecificContact" />
+					</form>
+				</div>
+				
+				<div id="addContactForm" style="display: none;">
+					<form>
+						Username : <input type="text" id="user_name" />
+						Password : <input type="password" id="user_password" />
+						Profession <input type="text" id="user_prof" />
+						<input type="button" value="Save Contact" id="saveContact" />
+					</form>
+				</div>
+				<div id="deleteContactForm" style="display: none;">
+					<form>
+						Delete contact based on Id: <input type="text" id="del_user_id" />
+						<input type="button" value="Delete Contact Details" id="deleteSpecificContact" />
+					</form>
+				</div>
+			</div>
+			
+		<br>
+		<span style="font-size:30px;cursor:pointer" onclick="openNav()" id="options" style="display: none;">View Options</span>
+		</div>
+		<script src="jquery-1.2.6.js" type="text/javascript"></script>
+		<script src="client.js" type="text/javascript"></script>
+	</body>
+</html>
