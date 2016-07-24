@@ -5,17 +5,22 @@ var app = express();
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var multer = require('multer');
+var cookieParser = require('cookie-parser')
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended : false}));
 
-app.use(multer({dest: __dirname + "/uploads/"}).single('file'));
+app.use(multer({dest: __dirname + "/uploads/",
+				 limits: {fileSize: 1000, files:1}}).single('file'));
+
+app.use(cookieParser());
 
 //Different HTTP Protocols supported by express based server
 //Listening to all GET requests at http://localhost:8085/
 app.get('/', function(req,res){
-	console.log("got a post request for homepage");
+	console.log("got a get request for homepage");
 	res.send("Hello GET!");
+	console.log(req.cookies);
 });
 
 //Listening to all POST requests at http://localhost:8085/
