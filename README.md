@@ -3,6 +3,7 @@ Mini Node.Js applicatoions covering different sections of the language
 
 This project contains code snippets in Node.Js to practice different fundamentals of the language. Primary sources from where the snippets were practiced : 
 * http://www.tutorialspoint.com/
+* http://www.w3schools.com/ (REST API UI - Side pane)
 
 Some of the snippets require modules to be downloaded. The snippet file contains details about module which are required to be downloaded. I am listing the module names here as well
 * express -> npm install express --save (Helps creating web and mobile applications)
