@@ -1,92 +1,147 @@
 var express = require('express');
 var fs = require('fs');
 var bodyParser = require('body-parser');
+var mysql = require('mysql');
 
 var app = express();
+
+//Using Mysql to store data. Please modify the properties to appropriate values to use this file.
+var MySQL_host = "localhost";
+var MySQL_username = "testUser";
+var MySQL_password = "password";
+var MySQL_db = "test";
+var MySQl_table = "contactData";
+var MySQl_conn_limit = 100;
+var MySql_SelectQuery = "Select * from " + MySQl_table;
+var MySql_SelectOneQuery = "Select * from " + MySQl_table + " where ";
+var MySQL_UpdateQuery = "Insert into " + MySQl_table + " SET ? ";
+var MySQL_DeleteQuery = "DELETE FROM " + MySQl_table +" WHERE id = ";
 
 //Importing all statuc files in the current directory
 app.use(express.static(__dirname));
 
 app.use(bodyParser.urlencoded({extended : true}));
 
-//Saving JSON Data into json file and responding back to request 
-function saveJSONDataAndRespond(file,data,res)
+//Assumes port be default - 3306
+var pool = mysql.createPool({
+	connectionLimit : MySQl_conn_limit,
+	host : MySQL_host,
+	user : MySQL_username,
+	password : MySQL_password,
+	database : MySQL_db,
+	debug : false
+});
+
+//Fetches records based on data. If id is given, only that specific record is fetched, else, all records are fetched
+function showDataFromTable(req,res)
 {
-	fs.writeFile(file, data, function(err,data){
-			if(err)
-			{
-				console.log(err);
-				return err;
-			}
-			response ={
-					message : "file uploaded successfully"
-				};
-			res.end(JSON.stringify(response));
+	var data = req.query.id;
+	pool.getConnection(function(err,connection){
+		if(err)
+		{
+			res.json({"code" : 100, "status" : "Error in connecting to database"});
+			return
+		}
+		
+		if(data == null || data == undefined)
+		{
+			connection.query(MySql_SelectQuery,function(err,rows){
+				connection.release();
+				if(!err) {
+					res.json(rows);
+				}           
+			});
+		}
+		else
+		{
+			connection.query(MySql_SelectOneQuery + "id= " + data,function(err,rows){
+				connection.release();
+				if(!err) {
+					res.json(rows);
+				}           
+			});
+		}
+		
+		connection.on('error', function(err) {      
+              res.json({"code" : 100, "status" : "Error in retrieving values"});
+              return;
+        });
+	});
+}
+
+//Adding a new record to the database
+function updateDataInTable(req,res)
+{
+	var data = req.body;
+	pool.getConnection(function(err,connection){
+		if(err)
+		{
+			res.json({"code" : 100, "status" : "Error in connecting to database"});
+			return
+		}
+		
+		connection.query(MySQL_UpdateQuery, data,function(err,rows){
+			connection.release();
+			if(!err) {
+				showDataFromTable(req,res);
+			}           
 		});
+	
+		connection.on('error', function(err) {      
+			  res.json({"code" : 100, "status" : "Error in retrieving values"});
+			  return;
+		});
+	});
+}
+
+//Deleting a record from the database based on the Id
+function deleteDataFromTable(req,res)
+{
+	var id  = req.query.id;
+	pool.getConnection(function(err,connection){
+		if(err)
+		{
+			res.json({"code" : 100, "status" : "Error in connecting to database"});
+			return
+		}
+		
+		connection.query(MySQL_DeleteQuery +id ,function(err,rows){
+			connection.release();
+			if(!err) {
+				showDataFromTable(req,res);
+			}           
+		});
+	
+		connection.on('error', function(err) {      
+			  res.json({"code" : 100, "status" : "Error in retrieving values"});
+			  return;
+		});
+	});
 }
 
 //GET to retrieve all contacts
 app.get('/GetAllContacts', function(req,res){
 	console.log( "getting all contacts" );
-	fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-	   res.end( data );
-   });
+	showDataFromTable(req,res);
 });
 
 //GET to retrieve contact details of Id specified
 app.get('/GetSpecificContact', function(req,res){
 	console.log( "getting specific contacts" );
-	var id  = req.query.id;
-	fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-	   
-	   var users = JSON.parse( data );
-	   //extracting the desired record
-	   var response = users["user" + id];
-	   var jsonData = {};
-	   jsonData.data = response;
-	   var finalData = JSON.stringify(jsonData)
-	   res.end(finalData);
-   });
-	
+	showDataFromTable(req,res);
 });
 
 //POST to add new contacts
 app.post('/SaveContact', function(req,res){
 	console.log("Saving data");
-	
-	var record = req.body;
-	fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-		var maxId = 0;
-		data = JSON.parse(data);
-		//finding unique Id for new record
-		for(var entry in data)
-		{
-			if(maxId < data[entry].id)
-				maxId = data[entry].id;
-		}
-		record.id = maxId+1;
-		var user = "user" + record.id;
-		data[user] = record;
-		data = JSON.stringify(data);
-		
-		saveJSONDataAndRespond(__dirname + "/" + "users.json", data,res);
-   });
+	updateDataInTable(req,res);
 });
 
 //GET to delete contact whose id is specified
 app.get('/DeleteSpecificContact', function(req,res){
 	
 	console.log( "Deleting contact" );
-	var id  = req.query.id;
-	fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-	   
-	   var users = JSON.parse( data );
-	   //deleting the desired record
-	   delete users["user" + id];
-	   var finalData = JSON.stringify(users);
-	   
-	   saveJSONDataAndRespond(__dirname + "/" + "users.json", finalData,res);
-   });
+	deleteDataFromTable(req,res);
 	
 });
 
