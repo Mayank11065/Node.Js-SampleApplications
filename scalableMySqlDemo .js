@@ -48,7 +48,7 @@ function handleDatabaseRequest(req,res)
 	});
 }
 
-app.get("/",function(req,res){-
+app.get("/",function(req,res){
         handleDatabaseRequest(req,res);
 });
 
@@ -59,27 +59,4 @@ var server = app.listen(8085,'localhost', function(){
 	
 	console.log("Server listening at http://%s:%s",host,port);
 });
-/*
-//show query result
-connection.query("select * from " + MySQl_table, function(err, rows, fields){
-	if(!err)
-	{
-		console.log("Query Result : ");
-		for(var i=0; i < rows.length; i++)
-		{
-			console.log("User : " + i);
-			var entry = rows[i];
-			for (var j =0;j < fields.length;j++)
-			{
-				field  =fields[j].name;
-				console.log(field + " : " + entry[field]);
-			}
-				
-		}
-	}
-	else
-	{
-		console.log("Error retrieving values. Error : "+ err);
-	}
-});
-*/
+
